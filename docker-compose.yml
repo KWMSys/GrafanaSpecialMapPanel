@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+    grafana:
+        image: grafana/grafana:7.0.0
+        volumes:
+            - ./:/var/lib/grafana/plugins/special-map-panel
+        ports: 
+            - 3000:3000
