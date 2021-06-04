@@ -5,5 +5,7 @@ services:
         image: grafana/grafana:7.0.0
         volumes:
             - ./:/var/lib/grafana/plugins/special-map-panel
+        environment: 
+            - GF_INSTALL_PLUGINS=simpod-json-datasource
         ports: 
             - 3000:3000
