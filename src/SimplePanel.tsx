@@ -9,6 +9,7 @@ interface Props extends PanelProps<SimpleOptions> {}
 
 export class SimplePanel extends React.Component<Props> {
   private mapId: string;
+  private map: Leaf.Map | undefined;
 
   constructor(props: Readonly<Props> | Props) {
     super(props);
@@ -18,7 +19,7 @@ export class SimplePanel extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const map = Leaf.map(this.mapId, {
+    this.map = Leaf.map(this.mapId, {
       worldCopyJump: true,
       preferCanvas: true,
       zoom: 1,
@@ -36,13 +37,14 @@ export class SimplePanel extends React.Component<Props> {
       subdomains: tileDetails.subdomains,
       detectRetina: true,
       attribution: tileDetails.attribution,
-    }).addTo(map);
+    }).addTo(this.map);
+  }
+
+  componentDidUpdate() {
+    this.map?.invalidateSize();
   }
 
   render() {
-    const id = this.props.id;
-    this.mapId = `special-map-${id}`;
-
     return (
       <div
         id={this.mapId}
