@@ -7,13 +7,14 @@ export interface SimpleOptions {
 export enum DataPointType {
   Circle = 'circle',
   Marker = 'marker',
+  Polygon = 'polygon',
 }
 
 export interface DataPoint {
   id: number;
   tooltip?: TooltipDataPointExtension;
   popup?: PopupDataPointExtension;
-  data: CircleDataPoint | MarkerDataPoint;
+  data: CircleDataPoint | MarkerDataPoint | PolygonDataPoint;
 }
 
 //#region DataPoint Types
@@ -23,6 +24,15 @@ export interface CircleDataPoint {
   lat: number;
   lng: number;
   options?: Leaf.CircleMarkerOptions;
+}
+
+export interface PolygonDataPoint {
+  type: DataPointType.Polygon;
+  points: Array<{
+    lat: number;
+    lng: number;
+  }>;
+  options?: Leaf.PolylineOptions;
 }
 
 export interface MarkerDataPoint {
