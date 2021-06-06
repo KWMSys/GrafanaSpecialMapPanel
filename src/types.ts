@@ -29,7 +29,7 @@ export interface MarkerDataPoint {
   type: DataPointType.Marker;
   lat: number;
   lng: number;
-  options?: {
+  options?: Leaf.MarkerOptions & {
     icon?: Leaf.IconOptions;
   };
 }

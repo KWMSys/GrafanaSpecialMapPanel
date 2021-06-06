@@ -81,7 +81,6 @@ export class SimplePanel extends React.Component<Props> {
                 pointLayer.bindTooltip(pointTooltip.content, pointTooltip?.options);
               }
               // Add popup if available
-              // TODO: Popup need some way of getting opened
               if (point.popup != null) {
                 const pointPopup = point.popup;
                 pointLayer.bindPopup(pointPopup.content, pointPopup?.options);
