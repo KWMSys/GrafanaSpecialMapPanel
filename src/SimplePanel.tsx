@@ -40,6 +40,11 @@ export class SimplePanel extends React.Component<Props> {
         // Set layout
         const layout = data?.layout;
         if (layout != null) {
+          // TODO: Get a change index from the api which will be saved
+          // here to check if the layout should be updated
+          // If the index is the same => nothing changes
+          // Else => update local index and change config
+          // !Also possible would be to save the layout and check if the layout has changed
           this.map?.setZoom(layout?.zoom);
           this.map?.setView(layout?.center);
         }
@@ -51,15 +56,39 @@ export class SimplePanel extends React.Component<Props> {
         const points = data?.data as DataPoint[];
         if (points != null && this.map != null) {
           for (let point of points) {
-            const pointType = point.type;
+            // const pointType = point.type;
+            let pointLayer: Leaf.Layer | null = null;
+
             // TODO: Keep already created map things and only change them
             // Create a new point
-            switch (pointType) {
+            switch (point.data.type) {
               case DataPointType.Circle:
-                this.layers.push(
-                  Leaf.circle({ lat: point.data.lat, lng: point.data.lng }, point.data?.options).addTo(this.map)
-                );
+                pointLayer = Leaf.circle({ lat: point.data.lat, lng: point.data.lng }, point.data?.options);
                 break;
+              case DataPointType.Marker:
+                const markerOptions: Leaf.MarkerOptions = {
+                  ...point?.data?.options,
+                  icon: point.data.options?.icon != null ? Leaf.icon(point.data.options.icon) : undefined,
+                };
+                pointLayer = Leaf.marker({ lat: point.data.lat, lng: point.data.lng }, markerOptions);
+                break;
+            }
+
+            if (pointLayer != null) {
+              // Add tooltip if available
+              if (point.tooltip != null) {
+                const pointTooltip = point.tooltip;
+                pointLayer.bindTooltip(pointTooltip.content, pointTooltip?.options);
+              }
+              // Add popup if available
+              // TODO: Popup need some way of getting opened
+              if (point.popup != null) {
+                const pointPopup = point.popup;
+                pointLayer.bindPopup(pointPopup.content, pointPopup?.options);
+              }
+
+              pointLayer.addTo(this.map);
+              this.layers.push(pointLayer);
             }
           }
         }
