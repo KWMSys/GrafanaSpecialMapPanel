@@ -8,13 +8,14 @@ export enum DataPointType {
   Circle = 'circle',
   Marker = 'marker',
   Polygon = 'polygon',
+  Polyline = 'polyline',
 }
 
 export interface DataPoint {
   id: number;
   tooltip?: TooltipDataPointExtension;
   popup?: PopupDataPointExtension;
-  data: CircleDataPoint | MarkerDataPoint | PolygonDataPoint;
+  data: CircleDataPoint | MarkerDataPoint | PolygonDataPoint | PolylineDataPoint;
 }
 
 //#region DataPoint Types
@@ -28,6 +29,15 @@ export interface CircleDataPoint {
 
 export interface PolygonDataPoint {
   type: DataPointType.Polygon;
+  points: Array<{
+    lat: number;
+    lng: number;
+  }>;
+  options?: Leaf.PolylineOptions;
+}
+
+export interface PolylineDataPoint {
+  type: DataPointType.Polyline;
   points: Array<{
     lat: number;
     lng: number;

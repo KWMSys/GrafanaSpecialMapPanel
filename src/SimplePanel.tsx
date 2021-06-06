@@ -71,6 +71,12 @@ export class SimplePanel extends React.Component<Props> {
                   point.data?.options
                 );
                 break;
+              case DataPointType.Polyline:
+                pointLayer = Leaf.polyline(
+                  point.data.points.map(x => [x.lat, x.lng]),
+                  point.data?.options
+                );
+                break;
               case DataPointType.Marker:
                 const markerOptions: Leaf.MarkerOptions = {
                   ...point?.data?.options,
