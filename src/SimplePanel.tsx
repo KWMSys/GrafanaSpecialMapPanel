@@ -50,8 +50,12 @@ export class SimplePanel extends React.Component<Props> {
 
     const firstRequest = this.previousLayout == null;
     const endpointQueryString = `?from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+    const headers = new Headers();
+    if (body != null) {
+      headers.append('Content-Type', 'application/json');
+    }
 
-    fetch(endpoint + endpointQueryString, { method, body })
+    fetch(endpoint + endpointQueryString, { method, body, headers })
       .then(data => data.json())
       .then(data => {
         console.log('API data', data);
