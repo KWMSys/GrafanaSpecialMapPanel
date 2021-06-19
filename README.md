@@ -1,6 +1,6 @@
 # Grafana Special Map plugin
 
-[![Build](https://github.com/KWMSys/GrafanaSpecialMapPanel/actions/workflows/CI/badge.svg)](https://github.com/KWMSys/GrafanaSpecialMapPanel/actions?query=workflow%3A%22CI%22)
+[![Build](https://github.com/KWMSys/GrafanaSpecialMapPanel/actions/workflows/ci.yml/badge.svg)](https://github.com/KWMSys/GrafanaSpecialMapPanel/actions?query=workflow%3A%22CI%22)
 
 A map panel plugin which allows custom displayment of data on a map by providing a JSON endpoint. Layout of JSON is similar to leaflet options.
 
