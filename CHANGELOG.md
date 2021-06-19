@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+Features:
+* Added `circle_marker` as datapoint type
+
 ## 1.0.2
 
 Features:

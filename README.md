@@ -40,7 +40,7 @@ Like shown in the example below, you can create markers, circles and more.
 * Each object must have an unique `id`.
 * `tooltip` and `popup` are optional
 * `data.options` is nearly the same as the `options` object of leaflet
-* `data.type` is required and currently there are `circle, marker, polygon and polyline`
+* `data.type` is required and currently there are `circle, marker, circle_marker polygon and polyline`
 * `data` layout depends on the `data.type` (Interfaces are below)
 
 ### Example
@@ -206,7 +206,7 @@ export interface DataPoint {
 ```ts
 
 export interface CircleDataPoint {
-  type: DataPointType.Circle;
+  type: DataPointType.Circle | DataPointType.CircleMarker;
   lat: number;
   lng: number;
   options?: Leaf.CircleMarkerOptions;

@@ -109,6 +109,9 @@ export class SimplePanel extends React.Component<Props> {
               case DataPointType.Circle:
                 pointLayer = Leaf.circle({ lat: point.data.lat, lng: point.data.lng }, point.data?.options);
                 break;
+              case DataPointType.CircleMarker:
+                pointLayer = Leaf.circleMarker({ lat: point.data.lat, lng: point.data.lng }, point.data?.options);
+                break;
               case DataPointType.Polygon:
                 pointLayer = Leaf.polygon(
                   point.data.points.map(x => [x.lat, x.lng]),

@@ -7,6 +7,7 @@ export interface SimpleOptions {
 
 export enum DataPointType {
   Circle = 'circle',
+  CircleMarker = 'circle_marker',
   Marker = 'marker',
   Polygon = 'polygon',
   Polyline = 'polyline',
@@ -22,7 +23,7 @@ export interface DataPoint {
 //#region DataPoint Types
 
 export interface CircleDataPoint {
-  type: DataPointType.Circle;
+  type: DataPointType.Circle | DataPointType.CircleMarker;
   lat: number;
   lng: number;
   options?: Leaf.CircleMarkerOptions;
