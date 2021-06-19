@@ -1,44 +1,241 @@
-# Grafana Panel Plugin Template
+# Grafana Special Map plugin
 
-[![Build](https://github.com/grafana/grafana-starter-panel/workflows/CI/badge.svg)](https://github.com/grafana/grafana-starter-panel/actions?query=workflow%3A%22CI%22)
+[![Build](https://github.com/KWMSys/GrafanaSpecialMapPanel/actions/workflows/CI/badge.svg)](https://github.com/KWMSys/GrafanaSpecialMapPanel/actions?query=workflow%3A%22CI%22)
 
-This template is a starting point for building Grafana Panel Plugins in Grafana 7.0+
+A map panel plugin which allows custom displayment of data on a map by providing a JSON endpoint. Layout of JSON is similar to leaflet options.
 
-## What is Grafana Panel Plugin?
+__GRAFANA DATASOURCES ARE NOT SUPPORTED__
+(Json Datasource plugin could be accessed by using the grafana datasource proxy)
 
-Panels are the building blocks of Grafana. They allow you to visualize data in different ways. While Grafana has several types of panels already built-in, you can also build your own panel, to add support for other visualizations.
+## Example
+
+![Example](./img/example.png)
 
 For more information about panels, refer to the documentation on [Panels](https://grafana.com/docs/grafana/latest/features/panels/panels/)
 
-## Getting started
+## JSON endpoint layout
 
-1. Install dependencies
+### Layout
 
-   ```bash
-   yarn install
-   ```
+All keys defined in `layout` will be applied to the map.
 
-2. Build plugin in development mode or run in watch mode
+A.e. if you dont set the zoom on the first request to 6 and dont want to change the zoom on a timerange change, you have to remove zoom from the layout on the next request.
+You could use the `firstRequest` query param to check if it is the first request and only then apply the zoom.
+```json
+{
+   "layout":{
+      "center":{
+         "lat":49,
+         "lng":8
+      },
+      "zoom":6
+   },
+   ...
+}
+```
 
-   ```bash
-   yarn dev
-   ```
+### Data
+Like shown in the example below, you can create markers, circles and more.
 
-   or
+* Each object must have an unique `id`.
+* `tooltip` and `popup` are optional
+* `data.options` is nearly the same as the `options` object of leaflet
+* `data.type` is required and currently there are `circle, marker, polygon and polyline`
+* `data` layout depends on the `data.type` (Interfaces are below)
 
-   ```bash
-   yarn watch
-   ```
+### Example
 
-3. Build plugin in production mode
+```json
+{
+   "layout":{
+      "center":{
+         "lat":49,
+         "lng":8
+      },
+      "zoom":6
+   },
+   "data":[
+      {
+         "id":0,
+         "tooltip":{
+            "content":"<span style=\"color: red;\">HTML SUPPORT</span> available"
+         },
+         "data":{
+            "type":"circle",
+            "lat":50,
+            "lng":10,
+            "options":{
+               "radius":20000,
+               "color":"blue"
+            }
+         }
+      },
+      {
+         "id":1,
+         "tooltip":{
+            "content":"Tooltip",
+            "options":{
+               "direction":"top"
+            }
+         },
+         "data":{
+            "type":"circle",
+            "lat":49,
+            "lng":8,
+            "options":{
+               "radius":60444.36457401041,
+               "color":"green"
+            }
+         }
+      },
+      {
+         "id":2,
+         "popup":{
+            "content":"Some PopUp"
+         },
+         "data":{
+            "type":"circle",
+            "lat":49,
+            "lng":9,
+            "options":{
+               "radius":77158.81345856893,
+               "color":"red"
+            }
+         }
+      },
+      {
+         "id":3,
+         "tooltip":{
+            "content":"Marker tooltip"
+         },
+         "data":{
+            "type":"marker",
+            "lat":48,
+            "lng":8,
+            "options":{
+               "icon":{
+                  "iconUrl":"data:image/png;base64,iVBORw0KGgoAAAANSUhE....",
+                  "iconSize":[
+                     30,
+                     30
+                  ],
+                  "iconAnchor":[
+                     15,
+                     30
+                  ]
+               },
+               "title":"Hello marker!"
+            }
+         }
+      },
+      {
+         "id":4,
+         "tooltip":{
+            "content":"Polygon <img style=\"width:100px;\" src=\"data:image/png;base64, iVBORw0KGgoAAAAN...\">"
+         },
+         "data":{
+            "type":"polygon",
+            "points":[
+               {
+                  "lat":43,
+                  "lng":8
+               },
+               {
+                  "lat":44,
+                  "lng":8
+               },
+               {
+                  "lat":47,
+                  "lng":9
+               },
+               {
+                  "lat":43,
+                  "lng":9
+               }
+            ],
+            "options":{
+               "color":"yellow"
+            }
+         }
+      },
+      {
+         "id":5,
+         "tooltip":{
+            "content":"Polyline"
+         },
+         "data":{
+            "type":"polyline",
+            "points":[
+               {
+                  "lat":50,
+                  "lng":8
+               },
+               {
+                  "lat":51,
+                  "lng":8
+               },
+               {
+                  "lat":52,
+                  "lng":9
+               },
+               {
+                  "lat":50,
+                  "lng":9
+               }
+            ],
+            "options":{
+               "color":"cyan"
+            }
+         }
+      }
+   ]
+}
+```
 
-   ```bash
-   yarn build
-   ```
+### Interfaces
+#### Datapoint
+```ts
+export interface DataPoint {
+  id: number;
+  tooltip?: TooltipDataPointExtension;
+  popup?: PopupDataPointExtension;
+  data: CircleDataPoint | MarkerDataPoint | PolygonDataPoint | PolylineDataPoint;
+}
+```
+#### Data of Datapoint
+```ts
 
-## Learn more
+export interface CircleDataPoint {
+  type: DataPointType.Circle;
+  lat: number;
+  lng: number;
+  options?: Leaf.CircleMarkerOptions;
+}
 
-- [Build a panel plugin tutorial](https://grafana.com/tutorials/build-a-panel-plugin)
-- [Grafana documentation](https://grafana.com/docs/)
-- [Grafana Tutorials](https://grafana.com/tutorials/) - Grafana Tutorials are step-by-step guides that help you make the most of Grafana
-- [Grafana UI Library](https://developers.grafana.com/ui) - UI components to help you build interfaces using Grafana Design System
+export interface PolygonDataPoint {
+  type: DataPointType.Polygon;
+  points: Array<{
+    lat: number;
+    lng: number;
+  }>;
+  options?: Leaf.PolylineOptions;
+}
+
+export interface PolylineDataPoint {
+  type: DataPointType.Polyline;
+  points: Array<{
+    lat: number;
+    lng: number;
+  }>;
+  options?: Leaf.PolylineOptions;
+}
+
+export interface MarkerDataPoint {
+  type: DataPointType.Marker;
+  lat: number;
+  lng: number;
+  options?: Leaf.MarkerOptions & {
+    icon?: Leaf.IconOptions;
+  };
+}
+```
