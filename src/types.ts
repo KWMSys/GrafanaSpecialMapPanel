@@ -2,6 +2,7 @@ import * as Leaf from 'leaflet';
 
 export interface SimpleOptions {
   mapEndpoint: string;
+  mapEndpointMethod: string;
 }
 
 export enum DataPointType {

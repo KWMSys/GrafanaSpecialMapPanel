@@ -13,6 +13,8 @@ export class SimplePanel extends React.Component<Props> {
   private time: { from?: number; to?: number } = {};
   private layers: Leaf.Layer[] = [];
 
+  private previousLayout = null;
+
   constructor(props: Readonly<Props> | Props) {
     super(props);
 
@@ -28,7 +30,28 @@ export class SimplePanel extends React.Component<Props> {
     const from = this.props.timeRange.from.unix();
     const to = this.props.timeRange.to.unix();
     // Fetch data
-    fetch(this.props.options.mapEndpoint + `?from=${from}&to=${to}`)
+
+    let endpoint = this.props.options.mapEndpoint;
+    endpoint = this.props.replaceVariables(endpoint);
+    const method = this.props.options.mapEndpointMethod ?? 'GET';
+    const body = ['POST', 'PUT'].includes(method)
+      ? JSON.stringify({
+          panelId: this.props.id,
+          options: this.props.options,
+          transparent: this.props.transparent,
+          title: this.props.title,
+          timeRange: this.props.timeRange,
+          timeZone: this.props.timeZone,
+          width: this.props.width,
+          height: this.props.height,
+          renderCount: this.props.renderCounter,
+        })
+      : null;
+
+    const firstRequest = this.previousLayout == null;
+    const endpointQueryString = `?from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+
+    fetch(endpoint + endpointQueryString, { method, body })
       .then(data => data.json())
       .then(data => {
         console.log('API data', data);
@@ -40,13 +63,23 @@ export class SimplePanel extends React.Component<Props> {
         // Set layout
         const layout = data?.layout;
         if (layout != null) {
-          // TODO: Get a change index from the api which will be saved
-          // here to check if the layout should be updated
-          // If the index is the same => nothing changes
-          // Else => update local index and change config
-          // !Also possible would be to save the layout and check if the layout has changed
-          this.map?.setZoom(layout?.zoom);
-          this.map?.setView(layout?.center);
+          const layoutKeys = Object.keys(layout).filter(x => layout.hasOwnProperty(x));
+          for (const layoutKey of layoutKeys) {
+            const layoutValue = layout[layoutKey];
+            switch (layoutKey) {
+              case 'zoom':
+                this.map?.setZoom(layoutValue);
+                break;
+              case 'center':
+                this.map?.setView(layoutValue);
+                break;
+            }
+          }
+
+          // Set previous layout for later use (maybe)
+          if (this.previousLayout == null) {
+            this.previousLayout = layout;
+          }
         }
 
         // Clear map
