@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+Features:
+* Added `area` to `layout` 
+
+Bugfixes:
+* Fixed `center` option on `layout` where `zoom` was set
+
 ## 1.0.1
 
 Bugfixes:

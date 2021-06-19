@@ -13,7 +13,7 @@ export class SimplePanel extends React.Component<Props> {
   private time: { from?: number; to?: number } = {};
   private layers: Leaf.Layer[] = [];
 
-  private previousLayout = null;
+  private previousLayout: any = null;
 
   constructor(props: Readonly<Props> | Props) {
     super(props);
@@ -75,7 +75,14 @@ export class SimplePanel extends React.Component<Props> {
                 this.map?.setZoom(layoutValue);
                 break;
               case 'center':
-                this.map?.setView(layoutValue);
+                console.log(layoutValue);
+                this.map?.setView(layoutValue, layout.zoom ?? null);
+                break;
+              case 'area':
+                this.map?.fitBounds(
+                  new Leaf.LatLngBounds(layoutValue.sw, layoutValue.ne),
+                  layoutValue?.options ?? null
+                );
                 break;
             }
           }
