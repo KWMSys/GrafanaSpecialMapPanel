@@ -16,9 +16,13 @@
     "@grafana/data": "latest",
     "@grafana/toolkit": "latest",
     "@grafana/ui": "latest",
+    "@types/leaflet": "^1.7.1",
     "emotion": "10.0.27"
   },
   "engines": {
     "node": ">=14"
+  },
+  "dependencies": {
+    "leaflet": "^1.7.1"
   }
 }
