@@ -27,10 +27,10 @@ export class SimplePanel extends React.Component<Props> {
     if (this.props.options.mapEndpoint == null || !this.hasTimeRangeChanged()) {
       return;
     }
+
     const from = this.props.timeRange.from.unix();
     const to = this.props.timeRange.to.unix();
     // Fetch data
-
     let endpoint = this.props.options.mapEndpoint;
     endpoint = this.props.replaceVariables(endpoint);
     const method = this.props.options.mapEndpointMethod ?? 'GET';
@@ -49,7 +49,18 @@ export class SimplePanel extends React.Component<Props> {
       : null;
 
     const firstRequest = this.previousLayout == null;
-    const endpointQueryString = `?from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+    // TODO: improve check for query params
+    let endpointQueryString = (endpoint.includes('?') ? '&' : '?') + `from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+    if (this.props.options.queryParams != null) {
+      const qp = this.props.options.queryParams;
+      Object.keys(qp).map(x => {
+        const paramString = this.props.replaceVariables(qp[x], undefined, 'json');
+        let pValues: string[] = paramString.startsWith('[') && paramString.endsWith(']') ? JSON.parse(paramString) : [paramString];
+        if (pValues.length > 0) {
+          endpointQueryString += '&' + pValues.map(y => `${x}=${encodeURI(y)}`).join('&');
+        }
+      });
+    }
     const headers = new Headers();
     if (body != null) {
       headers.append('Content-Type', 'application/json');
@@ -58,8 +69,6 @@ export class SimplePanel extends React.Component<Props> {
     fetch(endpoint + endpointQueryString, { method, body, headers })
       .then(data => data.json())
       .then(data => {
-        console.log('API data', data);
-
         // Set time of fetch
         this.time.to = to;
         this.time.from = from;
