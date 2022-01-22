@@ -3,6 +3,7 @@ import * as Leaf from 'leaflet';
 export interface SimpleOptions {
   mapEndpoint: string;
   mapEndpointMethod: string;
+  queryParams: {[key: string]: string};
 }
 
 export enum DataPointType {
