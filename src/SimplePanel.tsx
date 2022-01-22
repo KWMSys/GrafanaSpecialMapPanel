@@ -50,12 +50,16 @@ export class SimplePanel extends React.Component<Props> {
 
     const firstRequest = this.previousLayout == null;
     // TODO: improve check for query params
-    let endpointQueryString = (endpoint.includes('?') ? '&' : '?') + `from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+    let endpointQueryString =
+      (endpoint.includes('?') ? '&' : '?') + `from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+
     if (this.props.options.queryParams != null) {
       const qp = this.props.options.queryParams;
       Object.keys(qp).map(x => {
         const paramString = this.props.replaceVariables(qp[x], undefined, 'json');
-        let pValues: string[] = paramString.startsWith('[') && paramString.endsWith(']') ? JSON.parse(paramString) : [paramString];
+
+        let pValues: string[] =
+          paramString.startsWith('[') && paramString.endsWith(']') ? JSON.parse(paramString) : [paramString];
         if (pValues.length > 0) {
           endpointQueryString += '&' + pValues.map(y => `${x}=${encodeURI(y)}`).join('&');
         }

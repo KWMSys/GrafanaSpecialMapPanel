@@ -32,6 +32,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       id: 'queryParams',
       path: 'queryParams',
       name: 'Query Parameters',
-      editor: QueryParamEditor
+      editor: QueryParamEditor,
     });
 });
