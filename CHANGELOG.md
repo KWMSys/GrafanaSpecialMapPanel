@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5
+* Added status info in map
+
 ## 1.0.4
 * Added custom query params to endpoint config
 

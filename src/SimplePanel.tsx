@@ -7,11 +7,17 @@ import * as Leaf from 'leaflet';
 
 interface Props extends PanelProps<SimpleOptions> {}
 
+const errorStatusColor = '#ff0000b8';
+const defaultStatusColor = '#141619b8';
+
 export class SimplePanel extends React.Component<Props> {
   private mapId: string;
   private map: Leaf.Map | undefined;
   private time: { from?: number; to?: number } = {};
   private layers: Leaf.Layer[] = [];
+  private status?: { color: string; msg: string } | null = null;
+
+  private isForcedReload = false;
 
   private previousLayout: any = null;
 
@@ -70,8 +76,24 @@ export class SimplePanel extends React.Component<Props> {
       headers.append('Content-Type', 'application/json');
     }
 
+    this.status = {
+      color: defaultStatusColor,
+      msg: 'Loading...',
+    };
+    this.triggerUpdate();
     fetch(endpoint + endpointQueryString, { method, body, headers })
-      .then(data => data.json())
+      .then(data => {
+        if (data.ok) {
+          return data.json();
+        }
+        this.status = {
+          color: errorStatusColor,
+          msg: 'Fetching failed (a page reload may be required)',
+        };
+        console.error('Fetching failed', data);
+        this.triggerUpdate();
+        return Promise.reject(null);
+      })
       .then(data => {
         // Set time of fetch
         this.time.to = to;
@@ -88,7 +110,6 @@ export class SimplePanel extends React.Component<Props> {
                 this.map?.setZoom(layoutValue);
                 break;
               case 'center':
-                console.log(layoutValue);
                 this.map?.setView(layoutValue, layout.zoom ?? null);
                 break;
               case 'area':
@@ -163,6 +184,20 @@ export class SimplePanel extends React.Component<Props> {
             }
           }
         }
+
+        this.status = null;
+        this.triggerUpdate();
+      })
+      .catch(e => {
+        if (e == null) {
+          return;
+        }
+        console.error('Fetching failed', e);
+        this.status = {
+          color: errorStatusColor,
+          msg: "Can't fetch data! Please check connection and try reloading the page.",
+        };
+        this.triggerUpdate();
       });
   }
 
@@ -197,6 +232,11 @@ export class SimplePanel extends React.Component<Props> {
     return true;
   }
 
+  private triggerUpdate() {
+    this.isForcedReload = true;
+    this.forceUpdate();
+  }
+
   componentDidMount() {
     console.log('MOUNT EVENT');
     if (this.map == null) {
@@ -206,6 +246,10 @@ export class SimplePanel extends React.Component<Props> {
   }
 
   componentDidUpdate() {
+    if (this.isForcedReload) {
+      this.isForcedReload = false;
+      return;
+    }
     console.log('UPDATE EVENT');
     // Fix size of map
     this.map?.invalidateSize();
@@ -217,12 +261,35 @@ export class SimplePanel extends React.Component<Props> {
     console.log('RENDER EVENT');
     return (
       <div
-        id={this.mapId}
         className={css`
           widht: 100%;
           height: 100%;
+          position: relative;
         `}
-      ></div>
+      >
+        <div
+          id={this.mapId}
+          className={css`
+            widht: 100%;
+            height: 100%;
+          `}
+        ></div>
+        {this.status != null && (
+          <div
+            className={css`
+              position: absolute;
+              right: 0;
+              top: 0;
+              background-color: ${this.status.color};
+              padding: 0.25rem 1rem;
+              color: #eee;
+              z-index: 999;
+            `}
+          >
+            {this.status.msg}
+          </div>
+        )}
+      </div>
     );
   }
 }
