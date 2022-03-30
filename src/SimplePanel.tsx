@@ -210,9 +210,9 @@ export class SimplePanel extends React.Component<Props> {
     });
 
     const tileDetails = {
-      url: 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png',
+      url: 'https://{s}.tile.cdn.kwmsys.de/tiles/osmde/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      subdomains: 'abc',
+      subdomains: 'abcd',
     };
 
     Leaf.tileLayer(tileDetails.url, {
