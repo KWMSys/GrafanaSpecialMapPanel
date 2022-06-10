@@ -1,6 +1,6 @@
 {
   "name": "kwm-sys-special-map-panel",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "A special map plugin for grafana",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
