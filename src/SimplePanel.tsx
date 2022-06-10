@@ -67,7 +67,7 @@ export class SimplePanel extends React.Component<Props> {
         let pValues: string[] =
           paramString.startsWith('[') && paramString.endsWith(']') ? JSON.parse(paramString) : [paramString];
         if (pValues.length > 0) {
-          endpointQueryString += '&' + pValues.map(y => `${x}=${encodeURI(y)}`).join('&');
+          endpointQueryString += '&' + pValues.map(y => `${x}=${encodeURIComponent(y)}`).join('&');
         }
       });
     }
