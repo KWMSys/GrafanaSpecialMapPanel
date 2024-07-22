@@ -60,16 +60,16 @@ export class SimplePanel extends React.Component<Props> {
     const method = this.props.options.mapEndpointMethod ?? 'GET';
     const body = ['POST', 'PUT'].includes(method)
       ? JSON.stringify({
-        panelId: this.props.id,
-        options: this.props.options,
-        transparent: this.props.transparent,
-        title: this.props.title,
-        timeRange: this.props.timeRange,
-        timeZone: this.props.timeZone,
-        width: this.props.width,
-        height: this.props.height,
-        renderCount: this.props.renderCounter,
-      })
+          panelId: this.props.id,
+          options: this.props.options,
+          transparent: this.props.transparent,
+          title: this.props.title,
+          timeRange: this.props.timeRange,
+          timeZone: this.props.timeZone,
+          width: this.props.width,
+          height: this.props.height,
+          renderCount: this.props.renderCounter,
+        })
       : null;
 
     const firstRequest = this.previousLayout == null;
