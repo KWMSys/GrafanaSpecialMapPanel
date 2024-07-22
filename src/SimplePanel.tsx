@@ -16,15 +16,15 @@ export class SimplePanel extends React.Component<Props> {
   private time: { from?: number; to?: number } = {};
   private layers: Leaf.Layer[] = [];
   private status?: { color: string; msg: string } | null = null;
-  private menu: {
+  private menu: Array<{
     key: string;
     label: string;
-    usecases: {
+    usecases: Array<{
       key: string;
       label: any;
       state: boolean;
-    }[];
-  }[] = [];
+    }>;
+  }> = [];
 
   private isForcedReload = false;
 
@@ -43,7 +43,7 @@ export class SimplePanel extends React.Component<Props> {
       return;
     }
 
-    const optionsUnchecked: { customer: string; usecase: string }[] = [];
+    const optionsUnchecked: Array<{ customer: string; usecase: string }> = [];
     for (const menu of this.menu) {
       for (const usecase of menu.usecases) {
         if (!usecase.state && !optionsUnchecked.some(x => x.customer === menu.key && x.usecase === usecase.key)) {
@@ -329,14 +329,14 @@ export class SimplePanel extends React.Component<Props> {
           overflow: auto;
           `}>
           {this.menu?.map(x => (
-            <div>
+            <div key={x.key}>
               <div className={css`
                 padding: 0.25rem 1rem;
                 `}>
                 {x.label}
               </div>
               {x.usecases.map(y => (
-                <div className={css`
+                <div key={y.key} className={css`
                   `}>
                   <label className={css`
                     padding: 0.25rem 1rem;
