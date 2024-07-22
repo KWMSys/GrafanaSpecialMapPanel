@@ -30,24 +30,23 @@ export const QueryParamEditor: React.FC<StandardEditorProps<{ [key: string]: str
   return (
     <div>
       {Object.keys(value).map(key => (
-        <HorizontalGroup>
+        <HorizontalGroup key={key}>
           <Label description="">{key}</Label>
           <Input
             name="paramValue"
             value={value[key]}
             onChange={e => changeValue(key, (addKeyValue = e.currentTarget.value))}
             required
-            css={undefined}
           />
-          <IconButton name={'trash-alt'} onClick={() => removeValue(key)}></IconButton>
+          <IconButton aria-label='' name={'trash-alt'} onClick={() => removeValue(key)}></IconButton>
         </HorizontalGroup>
       ))}
       <HorizontalGroup>
         <Field label="Param Key">
-          <Input name="paramKey" onChange={e => (addKeyValue = e.currentTarget.value)} required css={undefined} />
+          <Input name="paramKey" onChange={e => (addKeyValue = e.currentTarget.value)} required />
         </Field>
-        <IconButton name={'plus-circle'} onClick={addValue}></IconButton>
+        <IconButton aria-label='' name={'plus-circle'} onClick={addValue}></IconButton>
       </HorizontalGroup>
-    </div>
+    </div >
   );
 };

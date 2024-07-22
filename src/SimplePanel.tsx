@@ -5,7 +5,7 @@ import { css } from 'emotion';
 // import { stylesFactory, useTheme } from '@grafana/ui';
 import * as Leaf from 'leaflet';
 
-interface Props extends PanelProps<SimpleOptions> {}
+interface Props extends PanelProps<SimpleOptions> { }
 
 const errorStatusColor = '#ff0000b8';
 const defaultStatusColor = '#141619b8';
@@ -16,6 +16,15 @@ export class SimplePanel extends React.Component<Props> {
   private time: { from?: number; to?: number } = {};
   private layers: Leaf.Layer[] = [];
   private status?: { color: string; msg: string } | null = null;
+  private menu: {
+    key: string;
+    label: string;
+    usecases: {
+      key: string;
+      label: any;
+      state: boolean;
+    }[];
+  }[] = [];
 
   private isForcedReload = false;
 
@@ -28,10 +37,19 @@ export class SimplePanel extends React.Component<Props> {
     this.mapId = `special-map-${id}`;
   }
 
-  private setMapFromMapData() {
+  private setMapFromMapData(doRefresh = false) {
     // No endpoint or same data? Then exit
-    if (this.props.options.mapEndpoint == null || !this.hasTimeRangeChanged()) {
+    if (this.props.options.mapEndpoint == null || (!this.hasTimeRangeChanged() && !doRefresh)) {
       return;
+    }
+
+    const optionsUnchecked: { customer: string; usecase: string }[] = [];
+    for (const menu of this.menu) {
+      for (const usecase of menu.usecases) {
+        if (!usecase.state && !optionsUnchecked.some(x => x.customer === menu.key && x.usecase === usecase.key)) {
+          optionsUnchecked.push({ customer: menu.key, usecase: usecase.key });
+        }
+      }
     }
 
     const from = this.props.timeRange.from.unix();
@@ -42,22 +60,29 @@ export class SimplePanel extends React.Component<Props> {
     const method = this.props.options.mapEndpointMethod ?? 'GET';
     const body = ['POST', 'PUT'].includes(method)
       ? JSON.stringify({
-          panelId: this.props.id,
-          options: this.props.options,
-          transparent: this.props.transparent,
-          title: this.props.title,
-          timeRange: this.props.timeRange,
-          timeZone: this.props.timeZone,
-          width: this.props.width,
-          height: this.props.height,
-          renderCount: this.props.renderCounter,
-        })
+        panelId: this.props.id,
+        options: this.props.options,
+        transparent: this.props.transparent,
+        title: this.props.title,
+        timeRange: this.props.timeRange,
+        timeZone: this.props.timeZone,
+        width: this.props.width,
+        height: this.props.height,
+        renderCount: this.props.renderCounter,
+      })
       : null;
 
     const firstRequest = this.previousLayout == null;
     // TODO: improve check for query params
-    let endpointQueryString =
-      (endpoint.includes('?') ? '&' : '?') + `from=${from}&to=${to}&firstRequest=${firstRequest ? 'true' : 'false'}`;
+    const endpointUrl = new URL(endpoint, "http://localhost");
+
+    endpointUrl.searchParams.set('from', from.toString());
+    endpointUrl.searchParams.set('to', to.toString());
+    endpointUrl.searchParams.set('firstRequest', firstRequest ? 'true' : 'false');
+
+    if (optionsUnchecked != null) {
+      endpointUrl.searchParams.set('optionsUnchecked', JSON.stringify(optionsUnchecked));
+    }
 
     if (this.props.options.queryParams != null) {
       const qp = this.props.options.queryParams;
@@ -67,7 +92,9 @@ export class SimplePanel extends React.Component<Props> {
         let pValues: string[] =
           paramString.startsWith('[') && paramString.endsWith(']') ? JSON.parse(paramString) : [paramString];
         if (pValues.length > 0) {
-          endpointQueryString += '&' + pValues.map(y => `${x}=${encodeURIComponent(y)}`).join('&');
+          for (const pValue of pValues) {
+            endpointUrl.searchParams.append(x, pValue);
+          }
         }
       });
     }
@@ -81,7 +108,7 @@ export class SimplePanel extends React.Component<Props> {
       msg: 'Loading...',
     };
     this.triggerUpdate();
-    fetch(endpoint + endpointQueryString, { method, body, headers })
+    fetch(endpointUrl.pathname + endpointUrl.search, { method, body, headers })
       .then(data => {
         if (data.ok) {
           return data.json();
@@ -98,6 +125,8 @@ export class SimplePanel extends React.Component<Props> {
         // Set time of fetch
         this.time.to = to;
         this.time.from = from;
+
+        this.menu = data.options
 
         // Set layout
         const layout = data?.layout;
@@ -141,7 +170,7 @@ export class SimplePanel extends React.Component<Props> {
             // Create a new point
             switch (point.data.type) {
               case DataPointType.Circle:
-                pointLayer = Leaf.circle({ lat: point.data.lat, lng: point.data.lng }, point.data?.options);
+                pointLayer = Leaf.circle({ lat: point.data.lat, lng: point.data.lng }, point.data?.options ?? { radius: 1 });
                 break;
               case DataPointType.CircleMarker:
                 pointLayer = Leaf.circleMarker({ lat: point.data.lat, lng: point.data.lng }, point.data?.options);
@@ -289,6 +318,48 @@ export class SimplePanel extends React.Component<Props> {
             {this.status.msg}
           </div>
         )}
+        <div className={css`
+          position: absolute;
+          right: 1rem;
+          top: 1rem;
+          background-color: #141619b8;
+          z-index: 888;
+          color: #eee;
+          max-height: 100%;
+          overflow: auto;
+          `}>
+          {this.menu?.map(x => (
+            <div>
+              <div className={css`
+                padding: 0.25rem 1rem;
+                `}>
+                {x.label}
+              </div>
+              {x.usecases.map(y => (
+                <div className={css`
+                  `}>
+                  <label className={css`
+                    padding: 0.25rem 1rem;
+                    display: flex;
+                    gap: 0.5rem;
+                    align-items: center;
+                    cursor: pointer;
+                    `}
+                  >
+                    <input type='checkbox' checked={y.state} onClick={() => {
+                      const found = this.menu.find(z => z.key === x.key)?.usecases.find(z => z.key === y.key);
+                      console.log('FOUND', found);
+                      if (found != null) {
+                        found.state = !found.state;
+                        this.setMapFromMapData(true);
+                      }
+                    }} />
+                    {y.label}
+                  </label>
+                </div>
+              ))}
+            </div>))}
+        </div>
       </div>
     );
   }
