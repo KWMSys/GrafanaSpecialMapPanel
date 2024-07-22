@@ -5,7 +5,7 @@ import { css } from 'emotion';
 // import { stylesFactory, useTheme } from '@grafana/ui';
 import * as Leaf from 'leaflet';
 
-interface Props extends PanelProps<SimpleOptions> {}
+interface Props extends PanelProps<SimpleOptions> { }
 
 const errorStatusColor = '#ff0000b8';
 const defaultStatusColor = '#141619b8';
@@ -46,7 +46,7 @@ export class SimplePanel extends React.Component<Props> {
     const optionsUnchecked: Array<{ customer: string; usecase: string }> = [];
     for (const menu of this.menu) {
       for (const usecase of menu.usecases) {
-        if (!usecase.state && !optionsUnchecked.some((x) => x.customer === menu.key && x.usecase === usecase.key)) {
+        if (!usecase.state && !optionsUnchecked.some(x => x.customer === menu.key && x.usecase === usecase.key)) {
           optionsUnchecked.push({ customer: menu.key, usecase: usecase.key });
         }
       }
@@ -60,16 +60,16 @@ export class SimplePanel extends React.Component<Props> {
     const method = this.props.options.mapEndpointMethod ?? 'GET';
     const body = ['POST', 'PUT'].includes(method)
       ? JSON.stringify({
-          panelId: this.props.id,
-          options: this.props.options,
-          transparent: this.props.transparent,
-          title: this.props.title,
-          timeRange: this.props.timeRange,
-          timeZone: this.props.timeZone,
-          width: this.props.width,
-          height: this.props.height,
-          renderCount: this.props.renderCounter,
-        })
+        panelId: this.props.id,
+        options: this.props.options,
+        transparent: this.props.transparent,
+        title: this.props.title,
+        timeRange: this.props.timeRange,
+        timeZone: this.props.timeZone,
+        width: this.props.width,
+        height: this.props.height,
+        renderCount: this.props.renderCounter,
+      })
       : null;
 
     const firstRequest = this.previousLayout == null;
@@ -86,7 +86,7 @@ export class SimplePanel extends React.Component<Props> {
 
     if (this.props.options.queryParams != null) {
       const qp = this.props.options.queryParams;
-      Object.keys(qp).map((x) => {
+      Object.keys(qp).map(x => {
         const paramString = this.props.replaceVariables(qp[x], undefined, 'json');
 
         let pValues: string[] =
@@ -109,7 +109,7 @@ export class SimplePanel extends React.Component<Props> {
     };
     this.triggerUpdate();
     fetch(endpointUrl.pathname + endpointUrl.search, { method, body, headers })
-      .then((data) => {
+      .then(data => {
         if (data.ok) {
           return data.json();
         }
@@ -121,7 +121,7 @@ export class SimplePanel extends React.Component<Props> {
         this.triggerUpdate();
         return Promise.reject(null);
       })
-      .then((data) => {
+      .then(data => {
         // Set time of fetch
         this.time.to = to;
         this.time.from = from;
@@ -131,7 +131,7 @@ export class SimplePanel extends React.Component<Props> {
         // Set layout
         const layout = data?.layout;
         if (layout != null) {
-          const layoutKeys = Object.keys(layout).filter((x) => layout.hasOwnProperty(x));
+          const layoutKeys = Object.keys(layout).filter(x => layout.hasOwnProperty(x));
           for (const layoutKey of layoutKeys) {
             const layoutValue = layout[layoutKey];
             switch (layoutKey) {
@@ -157,7 +157,7 @@ export class SimplePanel extends React.Component<Props> {
         }
 
         // Clear map
-        this.layers.forEach((x) => this.map?.removeLayer(x));
+        this.layers.forEach(x => this.map?.removeLayer(x));
 
         // Set data
         const points = data?.data as DataPoint[];
@@ -180,13 +180,13 @@ export class SimplePanel extends React.Component<Props> {
                 break;
               case DataPointType.Polygon:
                 pointLayer = Leaf.polygon(
-                  point.data.points.map((x) => [x.lat, x.lng]),
+                  point.data.points.map(x => [x.lat, x.lng]),
                   point.data?.options
                 );
                 break;
               case DataPointType.Polyline:
                 pointLayer = Leaf.polyline(
-                  point.data.points.map((x) => [x.lat, x.lng]),
+                  point.data.points.map(x => [x.lat, x.lng]),
                   point.data?.options
                 );
                 break;
@@ -220,7 +220,7 @@ export class SimplePanel extends React.Component<Props> {
         this.status = null;
         this.triggerUpdate();
       })
-      .catch((e) => {
+      .catch(e => {
         if (e == null) {
           return;
         }
@@ -333,7 +333,7 @@ export class SimplePanel extends React.Component<Props> {
             overflow: auto;
           `}
         >
-          {this.menu?.map((x) => (
+          {this.menu?.map(x => (
             <div key={x.key}>
               <div
                 className={css`
@@ -342,7 +342,7 @@ export class SimplePanel extends React.Component<Props> {
               >
                 {x.label}
               </div>
-              {x.usecases.map((y) => (
+              {x.usecases.map(y => (
                 <div key={y.key} className={css``}>
                   <label
                     className={css`
@@ -357,7 +357,7 @@ export class SimplePanel extends React.Component<Props> {
                       type="checkbox"
                       checked={y.state}
                       onClick={() => {
-                        const found = this.menu.find((z) => z.key === x.key)?.usecases.find((z) => z.key === y.key);
+                        const found = this.menu.find(z => z.key === x.key)?.usecases.find(z => z.key === y.key);
                         console.log('FOUND', found);
                         if (found != null) {
                           found.state = !found.state;
