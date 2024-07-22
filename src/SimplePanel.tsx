@@ -5,7 +5,7 @@ import { css } from 'emotion';
 // import { stylesFactory, useTheme } from '@grafana/ui';
 import * as Leaf from 'leaflet';
 
-interface Props extends PanelProps<SimpleOptions> { }
+interface Props extends PanelProps<SimpleOptions> {}
 
 const errorStatusColor = '#ff0000b8';
 const defaultStatusColor = '#141619b8';
