@@ -9,13 +9,7 @@
       "name": "MSDev",
       "url": "https://msdev.me"
     },
-    "keywords": [
-      "map",
-      "special",
-      "kwmsys",
-      "json",
-      "custom"
-    ],
+    "keywords": ["map", "special", "kwmsys", "json", "custom"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"

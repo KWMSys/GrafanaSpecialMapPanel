@@ -5,7 +5,7 @@ import { SimplePanel } from './SimplePanel';
 import 'leaflet/dist/leaflet.css';
 import { QueryParamEditor } from 'QueryParamEditor';
 
-export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions(builder => {
+export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions((builder) => {
   return builder
     .addSelect({
       category: ['Endpoint'],

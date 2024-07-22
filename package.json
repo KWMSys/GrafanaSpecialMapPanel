@@ -4,6 +4,7 @@
   "description": "A special map plugin for grafana",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
+    "fix": "prettier . --write",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
