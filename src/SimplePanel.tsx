@@ -5,7 +5,7 @@ import { css } from 'emotion';
 // import { stylesFactory, useTheme } from '@grafana/ui';
 import * as Leaf from 'leaflet';
 
-interface Props extends PanelProps<SimpleOptions> {}
+interface Props extends PanelProps<SimpleOptions> { }
 
 const errorStatusColor = '#ff0000b8';
 const defaultStatusColor = '#141619b8';
@@ -60,16 +60,16 @@ export class SimplePanel extends React.Component<Props> {
     const method = this.props.options.mapEndpointMethod ?? 'GET';
     const body = ['POST', 'PUT'].includes(method)
       ? JSON.stringify({
-          panelId: this.props.id,
-          options: this.props.options,
-          transparent: this.props.transparent,
-          title: this.props.title,
-          timeRange: this.props.timeRange,
-          timeZone: this.props.timeZone,
-          width: this.props.width,
-          height: this.props.height,
-          renderCount: this.props.renderCounter,
-        })
+        panelId: this.props.id,
+        options: this.props.options,
+        transparent: this.props.transparent,
+        title: this.props.title,
+        timeRange: this.props.timeRange,
+        timeZone: this.props.timeZone,
+        width: this.props.width,
+        height: this.props.height,
+        renderCount: this.props.renderCounter,
+      })
       : null;
 
     const firstRequest = this.previousLayout == null;
@@ -329,48 +329,66 @@ export class SimplePanel extends React.Component<Props> {
             background-color: #141619b8;
             z-index: 888;
             color: #eee;
-            max-height: 100%;
+            max-height: calc(100% - 3rem);
             overflow: auto;
+            display: flex;
+            flex-direction: column;
           `}
         >
-          {this.menu?.map(x => (
-            <div key={x.key}>
-              <div
-                className={css`
+          <div className={css`
+            background-color: #141619b8;
+            padding: 0.25rem 1rem;
+
+          `}>
+            <h2 className={css`
+            padding: 0;
+            margin: 0;
+            font-size: 1rem;
+          `}>Options
+            </h2>
+          </div>
+          <div className={css`
+            flex-grow: 1;
+            overflow: auto;
+          `}>
+            {this.menu?.map(x => (
+              <div key={x.key}>
+                <div
+                  className={css`
                   padding: 0.25rem 1rem;
                 `}
-              >
-                {x.label}
-              </div>
-              {x.usecases.map(y => (
-                <div key={y.key} className={css``}>
-                  <label
-                    className={css`
+                >
+                  {x.label}
+                </div>
+                {x.usecases.map(y => (
+                  <div key={y.key} className={css``}>
+                    <label
+                      className={css`
                       padding: 0.25rem 1rem;
                       display: flex;
                       gap: 0.5rem;
                       align-items: center;
                       cursor: pointer;
                     `}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={y.state}
-                      onClick={() => {
-                        const found = this.menu.find(z => z.key === x.key)?.usecases.find(z => z.key === y.key);
-                        console.log('FOUND', found);
-                        if (found != null) {
-                          found.state = !found.state;
-                          this.setMapFromMapData(true);
-                        }
-                      }}
-                    />
-                    {y.label}
-                  </label>
-                </div>
-              ))}
-            </div>
-          ))}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={y.state}
+                        onClick={() => {
+                          const found = this.menu.find(z => z.key === x.key)?.usecases.find(z => z.key === y.key);
+                          if (found != null) {
+                            found.state = !found.state;
+                            this.setMapFromMapData(true);
+                          }
+                        }}
+                      />
+                      {y.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
